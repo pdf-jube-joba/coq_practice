@@ -7,7 +7,7 @@ Variable G : forall n : nat , n_ary A A n.
 (*
 make Inductive definition like
 P :=
-| Ins (n:nat) , forall g_1 ... g_n , (P g_1) /\ .. /\ (P g_n) -> P (G n g1 ... gn) .
+| Ins (n:nat) : forall g_1 ... g_n , (P g_1) /\ .. /\ (P g_n) -> P (G n g1 ... gn) .
 *)
 
 Fixpoint L0 {T1 T2 T3 : Type} (n : nat)

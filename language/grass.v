@@ -1,9 +1,16 @@
+Section grass_code.
+
 Inductive snip :=
 | app : nat -> nat -> snip
 | def : nat -> code -> snip
 with code :=
 | Cnil : code
 | Ccns : snip -> code -> code.
+
+End grass_code.
+
+Section grass_operational_semantics.
+
 Inductive env_b : Set :=
 | com : code -> env -> env_b
 with env : Set :=
@@ -23,16 +30,12 @@ Notation "f ::/ D" := (Dcns f D)(at level 60).
 Fixpoint n_th (E : env) (n : nat) : option env_b :=
 match E with
 | f ::\ E' =>
-  match n with
-  | O => Some f
-  | S n' => n_th E' n'
-  end
+  match n with | O => Some f | S n' => n_th E' n' end
 | Enil => None
 end.
 
 Definition one_step (S:stack) : option stack :=
 match S with
-
 | Stk (app m n ::- C) E D =>
     let fn := n_th E n in
     let fm := n_th E m in
@@ -48,6 +51,9 @@ match S with
 | Stk Cnil (f ::\ E) ((C' &&- E') ::/ D) =>
       Some (Stk C' (f ::\ E') D)
 | Stk _ _ _ => None
-
 end.
+
+End grass_operational_semantics.
+
+
 

@@ -1,4 +1,6 @@
-Section grass_code.
+Module grass'.
+
+Section code.
 
 Inductive snip :=
 | app : nat -> nat -> snip
@@ -7,27 +9,31 @@ with code :=
 | Cnil : code
 | Ccns : snip -> code -> code.
 
-End grass_code.
+End code.
 
-Section grass_operational_semantics.
+Notation "I ::- C" := (Ccns I C)(at level 60).
 
-Inductive env_b : Set :=
-| com : code -> env -> env_b
+Section semantic.
+
+Section machine.
+
+Inductive env_one : Set :=
+| com : code -> env -> env_one
 with env : Set :=
 | Enil  : env
-| Ecns : env_b -> env -> env
+| Ecns : env_one -> env -> env
 with dmp : Set :=
 | Dnil  : dmp
-| Dcns : env_b -> dmp -> dmp.
+| Dcns : env_one -> dmp -> dmp.
+
 Inductive stack :=
 | Stk : code -> env -> dmp -> stack.
 
-Notation "I ::- C" := (Ccns I C)(at level 60).
 Notation "C &&- E" := (com C E) (at level 60).
 Notation "f ::\ E" := (Ecns f E)(at level 60).
 Notation "f ::/ D" := (Dcns f D)(at level 60).
 
-Fixpoint n_th (E : env) (n : nat) : option env_b :=
+Fixpoint n_th (E : env) (n : nat) : option env_one :=
 match E with
 | f ::\ E' =>
   match n with | O => Some f | S n' => n_th E' n' end
@@ -53,7 +59,25 @@ match S with
 | Stk _ _ _ => None
 end.
 
-End grass_operational_semantics.
+End machine.
 
+Section operational_semantics.
 
+Inductive has_value : stack -> env -> Prop :=
+| HALT : forall E : env , has_value (Stk Cnil E Dnil) E
+| step : forall (S S': stack) (E : env),
+    Some S = one_step S' -> has_value S E -> has_value S' E.
 
+Lemma L0:forall (E1 E2 : env), has_value (Stk Cnil E1 Dnil) E2 -> E1 = E2.
+Proof.
+  intros E1 E2 H.
+  induction H.
+
+Theorem partiality : forall (S:stack) (E1 E2:env),
+  has_value S E1 /\ has_value S E2 -> E1 = E2.
+Proof.
+  intros S E1 E2 H.
+  induction H as [H0 H1].
+  induction H0. 
+
+End semantic.

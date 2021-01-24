@@ -56,12 +56,9 @@ Instance operational_semantics (L :language)(V :value)
 (M :machine)(U :machine_semantic M V)(C :language_compile L M V)
 : language_semantic L V := {
   code_halt :=
-    (fun (c :code)(v :supp) => mchn_halt (compile c v));
+    (fun (c :code)(v :supp) => mchine_halt (compile c v));
   code_has_value :=
-    (fun (c :code)(v :supp) => mchn_has_value (compile c v) );
-  code_partiality (c :code)(v :supp)(H :mchn_halt (compile c v)) :=
+    (fun (c :code)(v :supp) => mchine_has_value (compile c v) );
+  code_partiality (c :code)(v :supp)(H :mchine_halt (compile c v)) :=
     (fun (v1 v2:supp) => machine_partiality (compile c v) H v1 v2);
 }.
-
-
-

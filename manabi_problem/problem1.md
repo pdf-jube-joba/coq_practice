@@ -1,4 +1,4 @@
-# 原始再帰的関数を作る際にはまった問題（未解決）
+# 原始再帰的関数を作る際にはまった問題
 ## 前提
 n項関数を`A-> ... n ... -> A -> B`としてとらえている。具体的には、
 ```
@@ -8,7 +8,7 @@ match n with | O => T2 | S n' => T1 -> (n_ary T1 T2 n') end.
 である。
 
 ## 問題
-`A:Type`と`n項関数G:forall`が与えられたときに、InductiveなPropとして次のようなものを作りたい。（ここでG 0 : Aであることに注意）
+`A:Type`と`n項関数G:forall n, n_ary n A A `が与えられたときに、InductiveなPropとして次のようなものを作りたい。（ここでG 0 : Aであることに注意）
 ```
 Inductive P : A -> Prop :=
 | S0 : P (G 0)
@@ -78,3 +78,29 @@ Inductive P : A -> Prop :=
 | S : forall (a:A), (F P) a.
 ```
 が同じ問題だと思われる。
+
+## 解決した
+方法としては、タプルにして相互再帰を用いた。ありがとうございます。
+```
+Section a.
+Fixpoint n_vec (n:nat) (a:Set) :=
+    match n with
+    | O => unit
+    | S m => prod a (n_vec m a)
+    end.
+
+Variable A : Set.
+Variable G : forall n , (n_vec n A) -> A.
+
+Inductive P : A -> Prop :=
+| FST : P ((G 0) tt)
+| MAP : forall n (x : (n_vec n A)) ,
+    P_lemma n x ->
+    P ((G n) x)
+with P_lemma : forall n, n_vec n A -> Prop :=
+| NIL : P_lemma 0 tt
+| CNS : forall n x X,
+    P x ->
+    P_lemma n X ->
+    P_lemma (S n) (pair x X).
+```
